@@ -1,0 +1,21 @@
+version: '3.3'
+
+services: 
+
+    mqtt_server:
+        container_name: mosquitto_dev
+        image: eclipse-mosquitto:latest
+        restart: always
+        volumes:
+            - ./hub/config/mosquitto:/mosquitto/config
+            - ./hub/data/mosquitto/data:/mosquitto/data
+            - ./hub/data/mosquitto/log:/mosquitto/log
+        ports:
+            - 1883:1883
+        user: '1000:1000'
+        
+    nodered:
+        container_name: nodered_dev
+        image: nodered/node-red
+        ports:
+            - 1880:1880

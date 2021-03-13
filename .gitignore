@@ -1,0 +1,6 @@
+node_modules
+vendor
+.idea
+hub/data/mosquitto/log/*.log
+hub/data/mosquitto/data/*.db
+bin/golangci-lint
