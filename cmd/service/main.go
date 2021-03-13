@@ -58,7 +58,7 @@ func main() {
 				service.MqttClient.Publish("cmd", "9:2")
 			}
 
-			if message.Port == 18 {
+			if message.Port == 18 { //nolint:gomnd
 				service.MqttClient.Publish("cmd", "23:2")
 			}
 		}
