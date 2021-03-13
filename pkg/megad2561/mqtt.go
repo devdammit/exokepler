@@ -1,8 +1,8 @@
 package megad2561
 
 import (
+	"encoding/json"
 	"fmt"
-	"os"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -27,7 +27,6 @@ func NewMqttClient(opts MqttClientOptions) MqttClient {
 	address := fmt.Sprintf("tcp://%v", opts.Address)
 
 	mqttOpts := mqtt.NewClientOptions().AddBroker(address).SetClientID("MegadGO")
-	mqttOpts.SetKeepAlive(2 * time.Second)
 	mqttOpts.SetPingTimeout(1 * time.Second)
 	mqttOpts.SetPassword(string(opts.Password))
 	mqttOpts.SetUsername(string(opts.ClientID))
@@ -43,17 +42,29 @@ func NewMqttClient(opts MqttClientOptions) MqttClient {
 	}
 }
 
-func (mc *MqttClient) Subscribe(cb mqtt.MessageHandler) {
-	if token := mc.connection.Subscribe("megad/#", 0, cb); token.Wait() && token.Error() != nil {
-		fmt.Println(token.Error())
-
-		os.Exit(1)
-	}
-}
-
 func (mc *MqttClient) Publish(topic string, msg string) {
 	client := mc.connection
 
 	token := client.Publish(fmt.Sprintf("megad/%v", topic), 0, false, msg)
 	token.Wait()
+}
+
+func (mc *MqttClient) AddHandler(in int, action *Action) error {
+	topic := fmt.Sprintf("megad/%v", in)
+	if token := mc.connection.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
+		var message MegadMessage
+
+		err := json.Unmarshal(msg.Payload(), &message)
+		if err != nil {
+			fmt.Println(CantParseMqttMessage(msg))
+		}
+
+		if message.Port == in {
+			mc.Publish("cmd", action.value)
+		}
+	}); token.Wait() && token.Error() != nil {
+		return CantSubscribeToPort(in)
+	}
+
+	return nil
 }

@@ -2,25 +2,25 @@ settings:
     host_ip: 192.168.88.14
     pwd: sec
     srv: 192.168.88.242
-    srvType: MQTT
+    srv_type: MQTT
     mqtt_password: kaDUN6HF
 
 ports:
     - id: 0
       actions:
-          - type: toggle
+          - type: TOGGLE
             value: 31
-          - type: pause
+          - type: PAUSE
             value: 1000
-          - type: toggle
+          - type: TOGGLE
             value: 31
             
     - id: 17
       actions:
-          - type: toggle
+          - type: TOGGLE
             value: 9
             
     - id: 18
       actions:
-          - type: toggle
+          - type: PAUSE
             value: 23

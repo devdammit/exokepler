@@ -71,6 +71,14 @@ func (s *Service) IsEnabledMqtt() bool {
 	return s.config.srvType == MQTT
 }
 
+func (s *Service) AddTrigger() {
+
+}
+
+/**
+ * Private
+**/
+
 func (s *Service) enableMqtt() {
 	mqttOpts := MqttClientOptions{Address: s.config.srv, ClientID: s.config.megadID, Password: s.config.mqttPassword}
 	s.MqttClient = NewMqttClient(mqttOpts)
