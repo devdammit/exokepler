@@ -42,7 +42,7 @@ func main() {
 	})
 	fmt.Println(err)
 
-	megadservice.AddHandlers(service.MqttClient)
+	megadservice.AddHandlers(&service.MqttClient)
 
 	<-c
 }

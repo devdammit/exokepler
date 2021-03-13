@@ -32,7 +32,7 @@ func MapActions(actions []ActionItemConfig) *megad2561.Action {
 	return &actionBuilder
 }
 
-func AddHandlers(mqtt megad2561.MqttClient) {
+func AddHandlers(mqtt *megad2561.MqttClient) {
 	var config Config
 
 	config.GetConf()
