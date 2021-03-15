@@ -6,14 +6,32 @@ import (
 	"log"
 )
 
+type ModeType int
+
+//go:generate stringer -type=ModeType -output=mode_type_string.go
+const (
+	_ ModeType = iota
+	CLICK
+	PRESS
+	ANY
+)
+
 type ActionItemConfig struct {
-	Type  string
-	Value int16
+	Type   string
+	Target int16
+	Value  int16
+}
+
+type PortModes struct {
+	Single    []ActionItemConfig `yaml:"single,omitempty"`
+	Double    []ActionItemConfig `yaml:"double,omitempty"`
+	LongPress []ActionItemConfig `yaml:"long_press,omitempty"`
 }
 
 type PortItemConfig struct {
-	ID      int `yaml:"id"`
-	Actions []ActionItemConfig
+	ID     int    `yaml:"id"`
+	Mode   string `yaml:"mode"`
+	Handle PortModes
 }
 
 type Config struct {
@@ -41,4 +59,21 @@ func (c *Config) GetConf() *Config {
 	}
 
 	return c
+}
+
+func ToModeType(source string) ModeType {
+	var modeType ModeType
+
+	switch source {
+	case CLICK.String():
+		modeType = CLICK
+	case PRESS.String():
+		modeType = PRESS
+	case ANY.String():
+		modeType = ANY
+	default:
+		modeType = CLICK
+	}
+
+	return modeType
 }

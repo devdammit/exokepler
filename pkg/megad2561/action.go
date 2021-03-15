@@ -21,13 +21,22 @@ type Action struct {
 // 4 - обратная синхронизация выхода со входов (кнопка нажата - лампа выключена; кнопка отпущена - лампа включена)
 //
 // [0..255] - в случае с диммируемым портами, установить значение диммера (яркости света).
-func (action *Action) Add(port int16, value int8) *Action {
+func (action *Action) Add(port int16, value int16) *Action {
 	command := fmt.Sprintf("%v:%v", port, value)
 	action.addCommand(command)
 
 	return action
 }
 
+func (action *Action) AddShim(port int16, value int16) *Action {
+	command := fmt.Sprintf("%v:*%v", port, value)
+
+	action.addCommand(command)
+
+	return action
+}
+
+// [WIP] - Надо реализовать механизм пауз на уровне сервиса
 // AddPause В сценариях контроллер поддерживает работу с паузами.
 //
 // value 1 - 100 милисекунд
@@ -53,7 +62,7 @@ func (action *Action) AddPause(value int16) *Action {
 // Включить порт 7; пауза 0,5с; выключить порт 7; пауза 0,5с; повторить все это с самого начала еще 4 раза
 // Таким образом порт включится и выключится 5 раз.
 // Такую команду можно использовать для более компактной записи сложных сценариев.
-func (action *Action) AddRepeat(value int8) *Action {
+func (action *Action) AddRepeat(value int16) *Action {
 	command := fmt.Sprintf("r%v", value)
 
 	action.addCommand(command)
@@ -64,7 +73,7 @@ func (action *Action) AddRepeat(value int8) *Action {
 // AddGlobal Управление всеми выходами.
 //
 // Например: value = 0 (выключить все выходы), value = 1 (включить все выходы).
-func (action *Action) AddGlobal(value int8) *Action {
+func (action *Action) AddGlobal(value int16) *Action {
 	command := fmt.Sprintf("a:%v", value)
 
 	action.addCommand(command)

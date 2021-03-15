@@ -18,10 +18,15 @@ type MqttClientOptions struct {
 	Password MQTTPwd
 }
 
-type MegadMessage struct {
+type MegadPortInMessage struct {
 	Port  int    `json:"port"`
+	Mode  int8   `json:"m"`
 	Value string `json:"value"`
+	Click int8   `json:"click,omitempty"`
+	Count int32  `json:"cnt"`
 }
+
+type MessageHandlerCallback func(msg MegadPortInMessage)
 
 func NewMqttClient(opts MqttClientOptions) MqttClient {
 	address := fmt.Sprintf("tcp://%v", opts.Address)
@@ -44,15 +49,25 @@ func NewMqttClient(opts MqttClientOptions) MqttClient {
 
 func (mc *MqttClient) Publish(topic string, msg string) {
 	client := mc.connection
-
+	fmt.Printf("publish %v:%v \n", topic, msg)
 	token := client.Publish(fmt.Sprintf("megad/%v", topic), 0, false, msg)
 	token.Wait()
+	if token.Error() != nil {
+		fmt.Println(token.Error())
+	}
 }
 
-func (mc *MqttClient) AddHandler(in int, action *Action) error {
+func (mc *MqttClient) SendAction(action Action) {
+	mc.Publish("cmd", action.value)
+}
+
+func (mc *MqttClient) AddHandler(in int, handler MessageHandlerCallback) error {
 	topic := fmt.Sprintf("megad/%v", in)
+
 	if token := mc.connection.Subscribe(topic, 0, func(client mqtt.Client, msg mqtt.Message) {
-		var message MegadMessage
+		var message MegadPortInMessage
+
+		fmt.Println(string(msg.Payload()))
 
 		err := json.Unmarshal(msg.Payload(), &message)
 		if err != nil {
@@ -60,7 +75,7 @@ func (mc *MqttClient) AddHandler(in int, action *Action) error {
 		}
 
 		if message.Port == in {
-			mc.Publish("cmd", action.value)
+			handler(message)
 		}
 	}); token.Wait() && token.Error() != nil {
 		return CantSubscribeToPort(in)

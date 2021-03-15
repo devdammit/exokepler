@@ -5,22 +5,47 @@ settings:
     srv_type: MQTT
     mqtt_password: kaDUN6HF
 
+
 ports:
     - id: 0
-      actions:
-          - type: TOGGLE
-            value: 31
-          - type: PAUSE
-            value: 1000
-          - type: TOGGLE
-            value: 31
-            
-    - id: 17
-      actions:
-          - type: TOGGLE
-            value: 9
-            
-    - id: 18
-      actions:
-          - type: PAUSE
-            value: 23
+      mode: CLICK
+      handle:
+          single:
+              - type: TOGGLE
+                target: 11
+              - type: TOGGLE
+                target: 26
+              - type: TOGGLE
+                target: 30
+          double:
+              - type: GLOBAL
+                value: 0
+          
+    - id: 1
+      mode: CLICK
+      handle:
+          single:
+              - type: TDIMMER
+                target: 10
+                value: 255
+          double:
+              - type: DIMMER
+                target: 10
+                value: 160
+              -
+    - id: 5
+      mode: CLICK
+      handle:
+          single:
+              - type: TOGGLE
+                target: 31
+          long_press:
+              - type: TOGGLE
+                target: 11
+                
+    - id: 20
+      mode: ANY
+      handle:
+          single:
+              - type: TOGGLE
+                target: 30
